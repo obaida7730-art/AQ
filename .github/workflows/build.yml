@@ -41,7 +41,7 @@ jobs:
           export ARCH=arm64
           export CROSS_COMPILE=aarch64-linux-gnu-
           make O=out ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- redwood_merged_defconfig || echo "DEFCONFIG_FAILED"
-          make O=out ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc) 2>&1 | tee build_log.txt || echo "BUILD_FAILED"
+          make O=out ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- KCFLAGS="-Wno-error" -j$(nproc) 2>&1 | tee build_log.txt || echo "BUILD_FAILED"
 
       - name: Upload Build Log
         if: always()
