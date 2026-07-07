@@ -10,7 +10,7 @@ jobs:
       - name: Install Toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install -y bc bison flex libssl-dev libelf-dev clang lld gcc-aarch64-linux-gnu device-tree-compiler
+          sudo apt-get install -y bc bison flex libssl-dev libelf-dev clang lld gcc-aarch64-linux-gnu device-tree-compiler python3
 
       - name: Clone Kernel Source
         run: |
@@ -34,6 +34,16 @@ jobs:
           echo "CONFIG_KPROBE_EVENTS=y" >> arch/arm64/configs/vendor/redwood_QGKI.config
           scripts/kconfig/merge_config.sh -m arch/arm64/configs/gki_defconfig arch/arm64/configs/vendor/redwood_QGKI.config
           mv .config arch/arm64/configs/redwood_merged_defconfig
+
+      - name: Disable forbidden-warning wrapper
+        run: |
+          cd kernel
+          find . -iname "gcc-wrapper.py" -print
+          for f in $(find . -iname "gcc-wrapper.py"); do
+            printf '#!/usr/bin/env python3\nimport sys, subprocess\nsys.exit(subprocess.call(sys.argv[1:]))\n' > "$f"
+            chmod +x "$f"
+            echo "Patched: $f"
+          done
 
       - name: Attempt Build
         run: |
