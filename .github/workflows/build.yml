@@ -19,16 +19,19 @@ jobs:
           git clone --depth 1 -b redwood-s-oss https://github.com/MiCode/vendor_qcom_opensource_wlan.git kernel/wlan
           git clone --depth 1 -b redwood-s-oss https://github.com/MiCode/kernel_build.git kernel/build
 
-      - name: Integrate KernelSU-Next (LTS mode)
+      - name: Integrate KernelSU-Next (legacy)
         run: |
           cd kernel
-          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s next-lts
+          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s legacy
 
       - name: Merge Config Fragment
         run: |
           cd kernel
           export ARCH=arm64
           echo "CONFIG_KSU=y" >> arch/arm64/configs/vendor/redwood_QGKI.config
+          echo "CONFIG_KPROBES=y" >> arch/arm64/configs/vendor/redwood_QGKI.config
+          echo "CONFIG_HAVE_KPROBES=y" >> arch/arm64/configs/vendor/redwood_QGKI.config
+          echo "CONFIG_KPROBE_EVENTS=y" >> arch/arm64/configs/vendor/redwood_QGKI.config
           scripts/kconfig/merge_config.sh -m arch/arm64/configs/gki_defconfig arch/arm64/configs/vendor/redwood_QGKI.config
           mv .config arch/arm64/configs/redwood_merged_defconfig
 
